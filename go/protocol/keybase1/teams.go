@@ -824,6 +824,70 @@ func (o FastTeamSigChainState) DeepCopy() FastTeamSigChainState {
 	}
 }
 
+type Audit struct {
+	Time           Time  `codec:"time" json:"time"`
+	MaxMerkleSeqno Seqno `codec:"maxMerkleSeqno" json:"maxMerkleSeqno"`
+}
+
+func (o Audit) DeepCopy() Audit {
+	return Audit{
+		Time:           o.Time.DeepCopy(),
+		MaxMerkleSeqno: o.MaxMerkleSeqno.DeepCopy(),
+	}
+}
+
+type AuditHistory struct {
+	ID               TeamID        `codec:"ID" json:"ID"`
+	Public           bool          `codec:"public" json:"public"`
+	PriorMerkleSeqno Seqno         `codec:"priorMerkleSeqno" json:"priorMerkleSeqno"`
+	Audits           []Audit       `codec:"audits" json:"audits"`
+	PreProbes        map[Seqno]int `codec:"preProbes" json:"preProbes"`
+	PostProbes       map[Seqno]int `codec:"postProbes" json:"postProbes"`
+}
+
+func (o AuditHistory) DeepCopy() AuditHistory {
+	return AuditHistory{
+		ID:               o.ID.DeepCopy(),
+		Public:           o.Public,
+		PriorMerkleSeqno: o.PriorMerkleSeqno.DeepCopy(),
+		Audits: (func(x []Audit) []Audit {
+			if x == nil {
+				return nil
+			}
+			ret := make([]Audit, len(x))
+			for i, v := range x {
+				vCopy := v.DeepCopy()
+				ret[i] = vCopy
+			}
+			return ret
+		})(o.Audits),
+		PreProbes: (func(x map[Seqno]int) map[Seqno]int {
+			if x == nil {
+				return nil
+			}
+			ret := make(map[Seqno]int, len(x))
+			for k, v := range x {
+				kCopy := k.DeepCopy()
+				vCopy := v
+				ret[kCopy] = vCopy
+			}
+			return ret
+		})(o.PreProbes),
+		PostProbes: (func(x map[Seqno]int) map[Seqno]int {
+			if x == nil {
+				return nil
+			}
+			ret := make(map[Seqno]int, len(x))
+			for k, v := range x {
+				kCopy := k.DeepCopy()
+				vCopy := v
+				ret[kCopy] = vCopy
+			}
+			return ret
+		})(o.PostProbes),
+	}
+}
+
 type TeamInviteCategory int
 
 const (

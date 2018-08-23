@@ -735,7 +735,7 @@ func (f *FastTeamChainLoader) audit(m libkb.MetaContext, arg fastLoadArg, state 
 	if !ok {
 		return NewAuditError("cannot run audit without merkle info for head")
 	}
-	return ProbabilisticMerkleTeamAudit(m, arg.ID, arg.Public, head, state.Chain.LinkIDs)
+	return m.G().GetTeamAuditor().AuditTeam(m, arg.ID, arg.Public, head, state.Chain.LinkIDs)
 }
 
 // readDownPointer reads a down pointer out of a given link, if it's unstubbed. Down pointers

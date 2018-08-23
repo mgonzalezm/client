@@ -786,6 +786,8 @@ export type AsyncOps =
   | 7 // LIST_RECURSIVE_TO_DEPTH_7
   | 8 // GET_REVISIONS_8
 
+export type Audit = $ReadOnly<{time: Time, maxMerkleSeqno: Seqno}>
+export type AuditHistory = $ReadOnly<{ID: TeamID, public: Boolean, priorMerkleSeqno: Seqno, audits?: ?Array<Audit>, preProbes: {[key: string]: Int}, postProbes: {[key: string]: Int}}>
 export type AuthenticityType =
   | 0 // SIGNED_0
   | 1 // REPUDIABLE_1
