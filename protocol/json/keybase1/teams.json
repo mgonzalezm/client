@@ -626,6 +626,14 @@
             "keys": "Seqno"
           },
           "name": "linkIDs"
+        },
+        {
+          "type": {
+            "type": "map",
+            "values": "MerkleRootV2",
+            "keys": "Seqno"
+          },
+          "name": "merkleInfo"
         }
       ]
     },

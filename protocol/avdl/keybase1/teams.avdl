@@ -266,6 +266,9 @@ protocol teams {
 
     // This is filled up to lastSeqno.
     map<Seqno, LinkID> linkIDs;
+
+    // For any link where we have it, fill in merkle sequence information.
+    map<Seqno, MerkleRootV2> merkleInfo;
   }
 
   enum TeamInviteCategory {

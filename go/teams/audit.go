@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"errors"
 	"github.com/keybase/client/go/libkb"
 	"github.com/keybase/client/go/protocol/keybase1"
 )
@@ -10,6 +9,6 @@ import (
 // The security factor of the audit is a function of the platform type, and the amount of time
 // since the last audit. This method should use some sort of long-lived cache (via local DB) so that
 // previous audits can be combined with the current one.
-func ProbabilisticMerkleTeamAudit(m libkb.MetaContext, id keybase1.TeamID, startMerkleSeqno keybase1.Seqno, chain []SCChainLink) (err error) {
-	return errors.New("stubbed out")
+func ProbabilisticMerkleTeamAudit(m libkb.MetaContext, id keybase1.TeamID, isPublic bool, headMerkle keybase1.MerkleRootV2, chain map[keybase1.Seqno]keybase1.LinkID) (err error) {
+	return nil
 }

@@ -737,6 +737,7 @@ type FastTeamSigChainState struct {
 	LastUpPointer           *UpPointer                              `codec:"lastUpPointer,omitempty" json:"lastUpPointer,omitempty"`
 	PerTeamKeyCTime         UnixTime                                `codec:"perTeamKeyCTime" json:"perTeamKeyCTime"`
 	LinkIDs                 map[Seqno]LinkID                        `codec:"linkIDs" json:"linkIDs"`
+	MerkleInfo              map[Seqno]MerkleRootV2                  `codec:"merkleInfo" json:"merkleInfo"`
 }
 
 func (o FastTeamSigChainState) DeepCopy() FastTeamSigChainState {
@@ -808,6 +809,18 @@ func (o FastTeamSigChainState) DeepCopy() FastTeamSigChainState {
 			}
 			return ret
 		})(o.LinkIDs),
+		MerkleInfo: (func(x map[Seqno]MerkleRootV2) map[Seqno]MerkleRootV2 {
+			if x == nil {
+				return nil
+			}
+			ret := make(map[Seqno]MerkleRootV2, len(x))
+			for k, v := range x {
+				kCopy := k.DeepCopy()
+				vCopy := v.DeepCopy()
+				ret[kCopy] = vCopy
+			}
+			return ret
+		})(o.MerkleInfo),
 	}
 }
 
