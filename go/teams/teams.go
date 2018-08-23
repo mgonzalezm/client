@@ -1246,8 +1246,8 @@ func (t *Team) sigTeamItemRaw(ctx context.Context, section SCTeamSection, linkTy
 	if err != nil {
 		return libkb.SigMultiItem{}, "", err
 	}
-
-	sig, err := ChangeSig(t.G(), me, latestLinkID, nextSeqno, deviceSigningKey, section, linkType, merkleRoot)
+	hPrev := t.chain().GetHPrev()
+	sig, err := ChangeSig(t.G(), me, latestLinkID, nextSeqno, deviceSigningKey, section, linkType, merkleRoot, hPrev)
 	if err != nil {
 		return libkb.SigMultiItem{}, "", err
 	}
@@ -1291,6 +1291,8 @@ func (t *Team) sigTeamItemRaw(ctx context.Context, section SCTeamSection, linkTy
 		libkb.SigHasRevokes(false),
 		seqType,
 		libkb.SigIgnoreIfUnsupported(false),
+		hPrev.HighSeqNo,
+		hPrev.HighPrev,
 	)
 	if err != nil {
 		return libkb.SigMultiItem{}, "", err

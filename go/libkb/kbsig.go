@@ -252,6 +252,23 @@ func remoteProofToTrackingStatement(s RemoteProofChainLink, base *jsonw.Wrapper)
 	return nil
 }
 
+type HPrevInfo struct {
+	// _struct   bool `codec:",toarray"`
+	HighSeqNo keybase1.Seqno
+	HighPrev  LinkID
+}
+
+func NewRootHPrevInfo() HPrevInfo {
+	return HPrevInfo{
+		HighSeqNo: keybase1.Seqno(0),
+		HighPrev:  LinkID(nil),
+	}
+}
+
+func (hp HPrevInfo) IsEmpty() bool {
+	return (hp.HighPrev.String() == "" && int(hp.HighSeqNo) == int(0))
+}
+
 type ProofMetadata struct {
 	Me                  *User
 	SigningUser         UserBasic
@@ -267,6 +284,7 @@ type ProofMetadata struct {
 	SeqType             keybase1.SeqType
 	MerkleRoot          *MerkleRoot
 	IgnoreIfUnsupported SigIgnoreIfUnsupported
+	HPrevInfo           HPrevInfo
 }
 
 func (arg ProofMetadata) merkleRootInfo(m MetaContext) (ret *jsonw.Wrapper) {
@@ -328,6 +346,16 @@ func (arg ProofMetadata) ToJSON(m MetaContext) (ret *jsonw.Wrapper, err error) {
 	ret.SetKey("expire_in", jsonw.NewInt(ei))
 	ret.SetKey("seqno", jsonw.NewInt64(int64(seqno)))
 	ret.SetKey("prev", prev)
+	hPrevInfo := jsonw.NewDictionary()
+	if arg.HPrevInfo.IsEmpty() {
+		hPrevInfo.SetKey("hash", jsonw.NewNil())
+		hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(0)))
+	} else {
+		hPrevHash := jsonw.NewString(arg.HPrevInfo.HighPrev.String())
+		hPrevInfo.SetKey("hash", hPrevHash)
+		hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(arg.HPrevInfo.HighSeqNo)))
+	}
+	ret.SetKey("hprev_info", hPrevInfo)
 
 	if arg.IgnoreIfUnsupported {
 		ret.SetKey("ignore_if_unsupported", jsonw.NewBool(true))
@@ -529,6 +557,8 @@ func MakeSig(
 			hasRevokes,
 			seqType,
 			ignoreIfUnsupported,
+			0,
+			nil,
 		)
 	default:
 		err = errors.New("Invalid Signature Version")

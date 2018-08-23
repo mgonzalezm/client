@@ -26,6 +26,7 @@ func metaContext(g *libkb.GlobalContext) libkb.MetaContext {
 }
 
 func TeamRootSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key libkb.GenericKey, teamSection SCTeamSection) (*jsonw.Wrapper, error) {
+	hPrev := libkb.NewRootHPrevInfo()
 	ret, err := libkb.ProofMetadata{
 		SigningUser: me,
 		Eldest:      me.GetEldestKID(),
@@ -34,6 +35,7 @@ func TeamRootSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key libkb.G
 		Seqno:       1,
 		SigVersion:  libkb.KeybaseSignatureV2,
 		SeqType:     seqTypeForTeamPublicness(teamSection.Public),
+		HPrevInfo:   hPrev,
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
@@ -74,6 +76,7 @@ func NewSubteamSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key libkb
 		SeqType:     seqTypeForTeamPublicness(parentTeam.IsPublic()), // children are as public as their parent
 		Seqno:       parentTeam.GetLatestSeqno() + 1,
 		PrevLinkID:  prevLinkID,
+		HPrevInfo:   parentTeam.GetHPrev(),
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
@@ -111,6 +114,7 @@ func SubteamHeadSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key libk
 		Seqno:       1,
 		SigVersion:  libkb.KeybaseSignatureV2,
 		SeqType:     seqTypeForTeamPublicness(subteamTeamSection.Public),
+		HPrevInfo:   libkb.NewRootHPrevInfo(),
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
@@ -144,6 +148,7 @@ func RenameSubteamSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key li
 		PrevLinkID:  prev,
 		SigVersion:  libkb.KeybaseSignatureV2,
 		SeqType:     seqTypeForTeamPublicness(teamSection.Public),
+		HPrevInfo:   parentTeam.GetHPrev(),
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
@@ -174,6 +179,7 @@ func RenameUpPointerSig(g *libkb.GlobalContext, me libkb.UserForSignatures, key 
 		PrevLinkID:  prev,
 		SigVersion:  libkb.KeybaseSignatureV2,
 		SeqType:     seqTypeForTeamPublicness(teamSection.Public),
+		HPrevInfo:   subteam.GetHPrev(),
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
@@ -212,7 +218,7 @@ func NewInviteID() SCTeamInviteID {
 }
 
 func ChangeSig(g *libkb.GlobalContext, me libkb.UserForSignatures, prev libkb.LinkID, seqno keybase1.Seqno, key libkb.GenericKey, teamSection SCTeamSection,
-	linkType libkb.LinkType, merkleRoot *libkb.MerkleRoot) (*jsonw.Wrapper, error) {
+	linkType libkb.LinkType, merkleRoot *libkb.MerkleRoot, hPrev libkb.HPrevInfo) (*jsonw.Wrapper, error) {
 	if teamSection.PerTeamKey != nil {
 		if teamSection.PerTeamKey.ReverseSig != "" {
 			return nil, errors.New("ChangeMembershipSig called with PerTeamKey.ReverseSig already set")
@@ -229,6 +235,7 @@ func ChangeSig(g *libkb.GlobalContext, me libkb.UserForSignatures, prev libkb.Li
 		SigVersion:  libkb.KeybaseSignatureV2,
 		SeqType:     seqTypeForTeamPublicness(teamSection.Public),
 		MerkleRoot:  merkleRoot,
+		HPrevInfo:   hPrev,
 	}.ToJSON(metaContext(g))
 	if err != nil {
 		return nil, err
