@@ -39,7 +39,33 @@ func (a *Auditor) AuditTeam(m libkb.MetaContext, id keybase1.TeamID, isPublic bo
 	return a.auditLocked(m, id, headMerkle, chain)
 }
 
+func (a *Auditor) getLRU() *lru.Cache {
+	a.lruMutex.Lock()
+	defer a.lruMutex.Unlock()
+	return a.lru
+}
+
+func (a *Auditor) getFromCache(m libkb.MetaContext, id keybase1.TeamID, lru *lru.Cache) (*keybase1.AuditHistory, error) {
+	return nil, nil
+}
+
+func (a *Auditor) putToCache(m libkb.MetaContext, id keybase1.TeamID, lru *lru.Cache, h *keybase1.AuditHistory) (err error) {
+	return nil
+}
+
 func (a *Auditor) auditLocked(m libkb.MetaContext, id keybase1.TeamID, headMerkle keybase1.MerkleRootV2, chain map[keybase1.Seqno]keybase1.LinkID) (err error) {
+
+	lru := a.getLRU()
+
+	history, err := a.getFromCache(m, id, lru)
+	if err != nil {
+		return err
+	}
+
+	err = a.putToCache(m, id, lru, history)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
