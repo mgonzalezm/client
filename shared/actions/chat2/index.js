@@ -2329,7 +2329,7 @@ const setMinWriterRole = (action: Chat2Gen.SetMinWriterRolePayload) => {
   })
 }
 
-const openChatFromWidget = (state: TypedState, {payload: {conversationIDKey}}: Chat2Gen.OpenChatFromWidget) =>
+const openChatFromWidget = (state: TypedState, {payload: {conversationIDKey}}: Chat2Gen.OpenChatFromWidgetPayload) =>
   Saga.sequentially([
     Saga.put(ConfigGen.createShowMain()),
     Saga.put(switchTo([chatTab])),
