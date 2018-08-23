@@ -769,6 +769,15 @@ func readDownPointer(m libkb.MetaContext, link *ChainLinkUnpacked) (*keybase1.Do
 	}, nil
 }
 
+// readMerkleRoot reads the merkle root out of the link if this link is unstubbed.
+func readMerkleRoot(m libkb.MetaContext, link *ChainLinkUnpacked) (*keybase1.MerkleRootV2, error) {
+	if link.inner == nil {
+		return nil, nil
+	}
+	ret := link.inner.Body.MerkleRoot.ToMerkleRootV2()
+	return &ret, nil
+}
+
 // readUpPointer reads an up pointer out the given link, if it's unstubbed. Up pointers are
 // (1) subteam heads; (2) subteam rename up pointers; and (3) subteam delete up pointers.
 // Will return (nil, non-nil) if we hit any error condition.
@@ -880,6 +889,13 @@ func (f *FastTeamChainLoader) putLinks(m libkb.MetaContext, arg fastLoadArg, sta
 		}
 		if ptk != nil {
 			state.Chain.PerTeamKeys[ptk.Gen] = *ptk
+		}
+		merkleRoot, err := readMerkleRoot(m, link)
+		if err != nil {
+			return err
+		}
+		if merkleRoot != nil {
+			state.Chain.MerkleInfo[link.Seqno()] = *merkleRoot
 		}
 	}
 	newLast := newLinks[len(newLinks)-1]
